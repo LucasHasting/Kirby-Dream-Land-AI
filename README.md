@@ -1,1 +1,3 @@
-# Kirby-Dream-Land-AI
+# AI Project: Kirby Dream Land
+
+## The Project
