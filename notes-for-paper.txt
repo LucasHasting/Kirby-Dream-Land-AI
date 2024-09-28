@@ -1,0 +1,23 @@
+- needs python 3.8
+pip install gym-retro
+pip install gym==0.25.2
+python -m retro.examples.interactive --game Airstriker-Genesis
+python -m retro.import /path/to/your/ROMs/directory/
+
+C:\Users\rebel\AppData\Local\Programs\Python\Python38 - executable
+C:\Users\rebel\Downloads\ai-project - project location
+
+move integration software to here
+C:\Users\rebel\AppData\Local\Programs\Python\Python38\Lib\site-packages\retro - retro location
+
+https://github.com/openai/retro/releases/tag/f347d7e
+
+data goes in C:\Users\rebel\AppData\Local\Programs\Python\Python38\Lib\site-packages\retro\data\stable\KirbysDreamLand-GameBoy
+
+Gambatte emulator
+
+6:00 - 8:00
+
+9:00 - 11:00
+
+research: min max
