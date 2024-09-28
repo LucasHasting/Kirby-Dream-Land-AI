@@ -12,7 +12,7 @@ ReadMe is WIP
 ## Project-Overview
 
 ## Project-Installation
-1. Install Python version 8.7 found here
+1. Install Python version 3.8.7 found here
 2. Install gym-retro
 3. Install gym version 0.25
 4. Move the KirbysDreamLand-GameBoy folder into the \Programs\Python\Python38\Lib\site-packages\retro\data\stable directory which may require some research on where that folder is based on the operating system. 
