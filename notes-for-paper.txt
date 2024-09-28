@@ -18,10 +18,10 @@ script to execute game: python.exe -m retro.examples.interactive --game KirbysDr
 
 Gambatte emulator - used for emulating the game
 
-6:00 - 8:00
+6:00 - 8:00: get gym-retro to work with example
 
-9:00 - 11:00
+9:00 - 11:00: get kirby dream land to work with example
 
-11:30 - 11:50
+11:30 - 12:00: organize notes and get github repo settled
 
 research: min max
