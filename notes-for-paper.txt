@@ -14,10 +14,14 @@ https://github.com/openai/retro/releases/tag/f347d7e
 
 data goes in C:\Users\rebel\AppData\Local\Programs\Python\Python38\Lib\site-packages\retro\data\stable\KirbysDreamLand-GameBoy
 
-Gambatte emulator
+script to execute game: python.exe -m retro.examples.interactive --game KirbysDreamLand-GameBoy
+
+Gambatte emulator - used for emulating the game
 
 6:00 - 8:00
 
 9:00 - 11:00
+
+11:30 - 11:50
 
 research: min max
