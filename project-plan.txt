@@ -1,0 +1,17 @@
+--AI Project
+Stage 1: Complete
+Stage 2: Get data used for manipulating the game, get pipeline system working (implements option 1)
+Stage 3: get AI input system working (implements option 2.2)
+
+Stage 4: create GUI, and options for the following:
+1. Run recording from file
+2. Record AI Gameplay:
+	1. Test training data from file
+	2. Create training data while the game is played
+3. Record your own gameplay
+
+Stage 5: implement option 2.2
+Stage 6: implement option 3
+Stage 7: Revise Documentation
+Stage 8: Create Release and complete ReadME
+Stage 9: Create Presentation and Paper
