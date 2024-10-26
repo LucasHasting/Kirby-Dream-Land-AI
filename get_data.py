@@ -1,6 +1,7 @@
-start = 49152 # screen begining address
+screen = 49152 # screen begining address
+
 i = 1
-cont = start
+cont = screen
 
 file = ""
 file += '{\n\t"info": {\n'
@@ -33,5 +34,5 @@ file += "\t}\n}"
 data_file = open('data.json', 'w')
 data_file.write(file)
 data_file.close()
-print(file)
+#print(file)
 #print(f"addresses {start} - {end - 1}")

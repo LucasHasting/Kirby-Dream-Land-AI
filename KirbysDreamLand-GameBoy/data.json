@@ -640,6 +640,662 @@
 			"address": 49311,
 			"type": ">u1"
 		},
+		"level_1": {
+			"address": 51712,
+			"type": ">u1"
+		},
+		"level_2": {
+			"address": 51713,
+			"type": ">u1"
+		},
+		"level_3": {
+			"address": 51714,
+			"type": ">u1"
+		},
+		"level_4": {
+			"address": 51715,
+			"type": ">u1"
+		},
+		"level_5": {
+			"address": 51716,
+			"type": ">u1"
+		},
+		"level_6": {
+			"address": 51717,
+			"type": ">u1"
+		},
+		"level_7": {
+			"address": 51718,
+			"type": ">u1"
+		},
+		"level_8": {
+			"address": 51719,
+			"type": ">u1"
+		},
+		"level_9": {
+			"address": 51720,
+			"type": ">u1"
+		},
+		"level_10": {
+			"address": 51721,
+			"type": ">u1"
+		},
+		"level_11": {
+			"address": 51722,
+			"type": ">u1"
+		},
+		"level_12": {
+			"address": 51723,
+			"type": ">u1"
+		},
+		"level_13": {
+			"address": 51724,
+			"type": ">u1"
+		},
+		"level_14": {
+			"address": 51725,
+			"type": ">u1"
+		},
+		"level_15": {
+			"address": 51726,
+			"type": ">u1"
+		},
+		"level_16": {
+			"address": 51727,
+			"type": ">u1"
+		},
+		"level_17": {
+			"address": 51728,
+			"type": ">u1"
+		},
+		"level_18": {
+			"address": 51729,
+			"type": ">u1"
+		},
+		"level_19": {
+			"address": 51730,
+			"type": ">u1"
+		},
+		"level_20": {
+			"address": 51731,
+			"type": ">u1"
+		},
+		"level_21": {
+			"address": 51732,
+			"type": ">u1"
+		},
+		"level_22": {
+			"address": 51733,
+			"type": ">u1"
+		},
+		"level_23": {
+			"address": 51734,
+			"type": ">u1"
+		},
+		"level_24": {
+			"address": 51735,
+			"type": ">u1"
+		},
+		"level_25": {
+			"address": 51736,
+			"type": ">u1"
+		},
+		"level_26": {
+			"address": 51737,
+			"type": ">u1"
+		},
+		"level_27": {
+			"address": 51738,
+			"type": ">u1"
+		},
+		"level_28": {
+			"address": 51739,
+			"type": ">u1"
+		},
+		"level_29": {
+			"address": 51740,
+			"type": ">u1"
+		},
+		"level_30": {
+			"address": 51741,
+			"type": ">u1"
+		},
+		"level_31": {
+			"address": 51742,
+			"type": ">u1"
+		},
+		"level_32": {
+			"address": 51743,
+			"type": ">u1"
+		},
+		"level_33": {
+			"address": 51744,
+			"type": ">u1"
+		},
+		"level_34": {
+			"address": 51745,
+			"type": ">u1"
+		},
+		"level_35": {
+			"address": 51746,
+			"type": ">u1"
+		},
+		"level_36": {
+			"address": 51747,
+			"type": ">u1"
+		},
+		"level_37": {
+			"address": 51748,
+			"type": ">u1"
+		},
+		"level_38": {
+			"address": 51749,
+			"type": ">u1"
+		},
+		"level_39": {
+			"address": 51750,
+			"type": ">u1"
+		},
+		"level_40": {
+			"address": 51751,
+			"type": ">u1"
+		},
+		"level_41": {
+			"address": 51752,
+			"type": ">u1"
+		},
+		"level_42": {
+			"address": 51753,
+			"type": ">u1"
+		},
+		"level_43": {
+			"address": 51754,
+			"type": ">u1"
+		},
+		"level_44": {
+			"address": 51755,
+			"type": ">u1"
+		},
+		"level_45": {
+			"address": 51756,
+			"type": ">u1"
+		},
+		"level_46": {
+			"address": 51757,
+			"type": ">u1"
+		},
+		"level_47": {
+			"address": 51758,
+			"type": ">u1"
+		},
+		"level_48": {
+			"address": 51759,
+			"type": ">u1"
+		},
+		"level_49": {
+			"address": 51760,
+			"type": ">u1"
+		},
+		"level_50": {
+			"address": 51761,
+			"type": ">u1"
+		},
+		"level_51": {
+			"address": 51762,
+			"type": ">u1"
+		},
+		"level_52": {
+			"address": 51763,
+			"type": ">u1"
+		},
+		"level_53": {
+			"address": 51764,
+			"type": ">u1"
+		},
+		"level_54": {
+			"address": 51765,
+			"type": ">u1"
+		},
+		"level_55": {
+			"address": 51766,
+			"type": ">u1"
+		},
+		"level_56": {
+			"address": 51767,
+			"type": ">u1"
+		},
+		"level_57": {
+			"address": 51768,
+			"type": ">u1"
+		},
+		"level_58": {
+			"address": 51769,
+			"type": ">u1"
+		},
+		"level_59": {
+			"address": 51770,
+			"type": ">u1"
+		},
+		"level_60": {
+			"address": 51771,
+			"type": ">u1"
+		},
+		"level_61": {
+			"address": 51772,
+			"type": ">u1"
+		},
+		"level_62": {
+			"address": 51773,
+			"type": ">u1"
+		},
+		"level_63": {
+			"address": 51774,
+			"type": ">u1"
+		},
+		"level_64": {
+			"address": 51775,
+			"type": ">u1"
+		},
+		"level_65": {
+			"address": 51776,
+			"type": ">u1"
+		},
+		"level_66": {
+			"address": 51777,
+			"type": ">u1"
+		},
+		"level_67": {
+			"address": 51778,
+			"type": ">u1"
+		},
+		"level_68": {
+			"address": 51779,
+			"type": ">u1"
+		},
+		"level_69": {
+			"address": 51780,
+			"type": ">u1"
+		},
+		"level_70": {
+			"address": 51781,
+			"type": ">u1"
+		},
+		"level_71": {
+			"address": 51782,
+			"type": ">u1"
+		},
+		"level_72": {
+			"address": 51783,
+			"type": ">u1"
+		},
+		"level_73": {
+			"address": 51784,
+			"type": ">u1"
+		},
+		"level_74": {
+			"address": 51785,
+			"type": ">u1"
+		},
+		"level_75": {
+			"address": 51786,
+			"type": ">u1"
+		},
+		"level_76": {
+			"address": 51787,
+			"type": ">u1"
+		},
+		"level_77": {
+			"address": 51788,
+			"type": ">u1"
+		},
+		"level_78": {
+			"address": 51789,
+			"type": ">u1"
+		},
+		"level_79": {
+			"address": 51790,
+			"type": ">u1"
+		},
+		"level_80": {
+			"address": 51791,
+			"type": ">u1"
+		},
+		"level_81": {
+			"address": 51792,
+			"type": ">u1"
+		},
+		"level_82": {
+			"address": 51793,
+			"type": ">u1"
+		},
+		"level_83": {
+			"address": 51794,
+			"type": ">u1"
+		},
+		"level_84": {
+			"address": 51795,
+			"type": ">u1"
+		},
+		"level_85": {
+			"address": 51796,
+			"type": ">u1"
+		},
+		"level_86": {
+			"address": 51797,
+			"type": ">u1"
+		},
+		"level_87": {
+			"address": 51798,
+			"type": ">u1"
+		},
+		"level_88": {
+			"address": 51799,
+			"type": ">u1"
+		},
+		"level_89": {
+			"address": 51800,
+			"type": ">u1"
+		},
+		"level_90": {
+			"address": 51801,
+			"type": ">u1"
+		},
+		"level_91": {
+			"address": 51802,
+			"type": ">u1"
+		},
+		"level_92": {
+			"address": 51803,
+			"type": ">u1"
+		},
+		"level_93": {
+			"address": 51804,
+			"type": ">u1"
+		},
+		"level_94": {
+			"address": 51805,
+			"type": ">u1"
+		},
+		"level_95": {
+			"address": 51806,
+			"type": ">u1"
+		},
+		"level_96": {
+			"address": 51807,
+			"type": ">u1"
+		},
+		"level_97": {
+			"address": 51808,
+			"type": ">u1"
+		},
+		"level_98": {
+			"address": 51809,
+			"type": ">u1"
+		},
+		"level_99": {
+			"address": 51810,
+			"type": ">u1"
+		},
+		"level_100": {
+			"address": 51811,
+			"type": ">u1"
+		},
+		"level_101": {
+			"address": 51812,
+			"type": ">u1"
+		},
+		"level_102": {
+			"address": 51813,
+			"type": ">u1"
+		},
+		"level_103": {
+			"address": 51814,
+			"type": ">u1"
+		},
+		"level_104": {
+			"address": 51815,
+			"type": ">u1"
+		},
+		"level_105": {
+			"address": 51816,
+			"type": ">u1"
+		},
+		"level_106": {
+			"address": 51817,
+			"type": ">u1"
+		},
+		"level_107": {
+			"address": 51818,
+			"type": ">u1"
+		},
+		"level_108": {
+			"address": 51819,
+			"type": ">u1"
+		},
+		"level_109": {
+			"address": 51820,
+			"type": ">u1"
+		},
+		"level_110": {
+			"address": 51821,
+			"type": ">u1"
+		},
+		"level_111": {
+			"address": 51822,
+			"type": ">u1"
+		},
+		"level_112": {
+			"address": 51823,
+			"type": ">u1"
+		},
+		"level_113": {
+			"address": 51824,
+			"type": ">u1"
+		},
+		"level_114": {
+			"address": 51825,
+			"type": ">u1"
+		},
+		"level_115": {
+			"address": 51826,
+			"type": ">u1"
+		},
+		"level_116": {
+			"address": 51827,
+			"type": ">u1"
+		},
+		"level_117": {
+			"address": 51828,
+			"type": ">u1"
+		},
+		"level_118": {
+			"address": 51829,
+			"type": ">u1"
+		},
+		"level_119": {
+			"address": 51830,
+			"type": ">u1"
+		},
+		"level_120": {
+			"address": 51831,
+			"type": ">u1"
+		},
+		"level_121": {
+			"address": 51832,
+			"type": ">u1"
+		},
+		"level_122": {
+			"address": 51833,
+			"type": ">u1"
+		},
+		"level_123": {
+			"address": 51834,
+			"type": ">u1"
+		},
+		"level_124": {
+			"address": 51835,
+			"type": ">u1"
+		},
+		"level_125": {
+			"address": 51836,
+			"type": ">u1"
+		},
+		"level_126": {
+			"address": 51837,
+			"type": ">u1"
+		},
+		"level_127": {
+			"address": 51838,
+			"type": ">u1"
+		},
+		"level_128": {
+			"address": 51839,
+			"type": ">u1"
+		},
+		"level_129": {
+			"address": 51840,
+			"type": ">u1"
+		},
+		"level_130": {
+			"address": 51841,
+			"type": ">u1"
+		},
+		"level_131": {
+			"address": 51842,
+			"type": ">u1"
+		},
+		"level_132": {
+			"address": 51843,
+			"type": ">u1"
+		},
+		"level_133": {
+			"address": 51844,
+			"type": ">u1"
+		},
+		"level_134": {
+			"address": 51845,
+			"type": ">u1"
+		},
+		"level_135": {
+			"address": 51846,
+			"type": ">u1"
+		},
+		"level_136": {
+			"address": 51847,
+			"type": ">u1"
+		},
+		"level_137": {
+			"address": 51848,
+			"type": ">u1"
+		},
+		"level_138": {
+			"address": 51849,
+			"type": ">u1"
+		},
+		"level_139": {
+			"address": 51850,
+			"type": ">u1"
+		},
+		"level_140": {
+			"address": 51851,
+			"type": ">u1"
+		},
+		"level_141": {
+			"address": 51852,
+			"type": ">u1"
+		},
+		"level_142": {
+			"address": 51853,
+			"type": ">u1"
+		},
+		"level_143": {
+			"address": 51854,
+			"type": ">u1"
+		},
+		"level_144": {
+			"address": 51855,
+			"type": ">u1"
+		},
+		"level_145": {
+			"address": 51856,
+			"type": ">u1"
+		},
+		"level_146": {
+			"address": 51857,
+			"type": ">u1"
+		},
+		"level_147": {
+			"address": 51858,
+			"type": ">u1"
+		},
+		"level_148": {
+			"address": 51859,
+			"type": ">u1"
+		},
+		"level_149": {
+			"address": 51860,
+			"type": ">u1"
+		},
+		"level_150": {
+			"address": 51861,
+			"type": ">u1"
+		},
+		"level_151": {
+			"address": 51862,
+			"type": ">u1"
+		},
+		"level_152": {
+			"address": 51863,
+			"type": ">u1"
+		},
+		"level_153": {
+			"address": 51864,
+			"type": ">u1"
+		},
+		"level_154": {
+			"address": 51865,
+			"type": ">u1"
+		},
+		"level_155": {
+			"address": 51866,
+			"type": ">u1"
+		},
+		"level_156": {
+			"address": 51867,
+			"type": ">u1"
+		},
+		"level_157": {
+			"address": 51868,
+			"type": ">u1"
+		},
+		"level_158": {
+			"address": 51869,
+			"type": ">u1"
+		},
+		"level_159": {
+			"address": 51870,
+			"type": ">u1"
+		},
+		"level_160": {
+			"address": 51871,
+			"type": ">u1"
+		},
+		"level_161": {
+			"address": 51872,
+			"type": ">u1"
+		},
+		"level_162": {
+			"address": 51873,
+			"type": ">u1"
+		},
+		"level_163": {
+			"address": 51874,
+			"type": ">u1"
+		},
+		"level_164": {
+			"address": 51875,
+			"type": ">u1"
+		},
 		"game_state": {
 			"address": 53292,
 			"type": ">u1"
@@ -662,7 +1318,7 @@
 		},
 		"kirby_x": {
 			"address": 53331,
-			"type": ">u1"
+			"type": ">u2"
 		}
 	}
 }
