@@ -200,22 +200,29 @@ def add_to_data(total_data, new_data, moves, move, move_sizes, move_size):
     
 #update the move prediciton model
 def update_model(total_data, moves):
+    #if there are not enough moves to make the model, return 0
     if(len(list(set(moves))) < 2):
         return 0
+
+    #make the move classification model
     model = linear_model.LogisticRegression(solver='liblinear', C=1)
     model.fit(total_data, moves)
 
+    #return the model
     return model
 
 #update the move size prediciton model
 def update_move_size_model(moves, move_sizes):
+    #update the move size prediciton model
     if(len(list(set(moves))) < 2):
         return 0
 
+    #make the move classification model
     move_size_model = linear_model.LinearRegression()
     temp_moves = [[i] for i in moves]
     move_size_model.fit(temp_moves, move_sizes)
 
+    #return the model
     return move_size_model
 
 #run the driver
