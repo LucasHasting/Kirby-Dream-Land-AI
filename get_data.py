@@ -28,7 +28,9 @@ file += '\t\t"kirby_health": {\n\t\t\t"address": ' + str(53382) + ',\n\t\t\t"typ
 file += '\t\t"kirby_life": {\n\t\t\t"address": ' + str(53385) + ',\n\t\t\t"type": ">u1"\n\t\t},\n'
 file += '\t\t"boss_health": {\n\t\t\t"address": ' + str(53395) + ',\n\t\t\t"type": ">u1"\n\t\t},\n'
 file += '\t\t"kirby_x_scrol": {\n\t\t\t"address": ' + str(53340) + ',\n\t\t\t"type": ">u1"\n\t\t},\n'
-file += '\t\t"kirby_x": {\n\t\t\t"address": ' + str(53331) + ',\n\t\t\t"type": ">u2"\n\t\t}\n'
+file += '\t\t"kirby_x": {\n\t\t\t"address": ' + str(53331) + ',\n\t\t\t"type": ">u2"\n\t\t},\n'
+file += '\t\t"kirby_y_scrol": {\n\t\t\t"address": ' + str(53341) + ',\n\t\t\t"type": ">u1"\n\t\t},\n'
+file += '\t\t"kirby_y": {\n\t\t\t"address": ' + str(53333) + ',\n\t\t\t"type": ">u2"\n\t\t}\n'
 file += "\t}\n}"
 
 data_file = open('data.json', 'w')
