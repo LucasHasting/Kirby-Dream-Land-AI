@@ -12,6 +12,8 @@ MAN_MOVE_SIZE = 60
 
 #pit.state
 #begginning.state
+#door.state
+#boss.state
 STATE_FILE = "begginning.state"
 
 #create map of inputs to position in action array
@@ -69,7 +71,7 @@ def main():
     current_state = GAME_STATES[0]
     
     #create the enviornment
-    env = retro.make('KirbysDreamLand-GameBoy', STATE_FILE)
+    env = retro.make('KirbysDreamLand-GB', STATE_FILE)
     env.reset()
 
     #initilize default values
@@ -94,7 +96,7 @@ def main():
         before = load_data(info, STATE_MAP[current_state])
 
         #if a model has not been created
-        if(model == 0):
+        if(model == 0 or current_state == "UNKOWN"):
             #get the current state and make a random move until it is good
             model, move_size_model, current_state = make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)
         else:
@@ -176,16 +178,14 @@ def make_move(info, model, total_data, moves, state, env, move_size_model, move_
     make_movement(INVERSE_INPUTS[move], env, move_size_model)
     ob, rew, done, info, move_size = make_movement(INVERSE_INPUTS[move], env, move_size_model)
     time.sleep(SLEEP_TIME)
-    print("Predicted: ", INVERSE_INPUTS[move], move_size)
 
     #load data after the move was made
     after = load_data(info, STATE_MAP[current_state])
 
     #check game state
     current_state = determine_game_state([before[-2], before[-3], before[-7], before[-8]], current_state)
+    print("Predicted: ", INVERSE_INPUTS[move], move_size, current_state)
 
-
-    print(current_state)
     #determine if the move was good, if so, update the model. Otherwise, try a random move until a good move occurs
     if(good_move([before[-2], before[-1], before[-3], before[-4], before[-5], before[-6]], [after[-2], after[-1], after[-3], after[-4], after[-5], before[-6]], current_state)):
        add_to_data(total_data, after, moves, move, move_sizes, move_size)
@@ -209,15 +209,13 @@ def make_random_move(info, model, total_data, moves, state, env, move_size_model
     make_random_movement(move, env)
     ob, rew, done, info, move_size = make_random_movement(move, env)
     time.sleep(SLEEP_TIME)
-    print(move, move_size)
 
     #load data after the move was made
     after = load_data(info, STATE_MAP[current_state])
 
     #check game state
     current_state = determine_game_state([after[-2], after[-3], after[-7], after[-8]], current_state)
-
-    print(current_state)
+    print(move, move_size, current_state)
 
     #determine if the move was good, if so, update the model. Otherwise, try again 
     if(good_move([before[-2], before[-1], before[-3], before[-4], before[-5], before[-6]], [after[-2], after[-1], after[-3], after[-4], after[-5], before[-6]], current_state)):
@@ -269,7 +267,7 @@ def determine_game_state(data_after, current_state):
     scroll_y = data_after[1]
     boss_health = data_after[2]
     game_state = data_after[3]
-    print(f"scroll_x: {scroll_x}, scroll_y: {scroll_y}, boss_health: {boss_health}, game_state: {game_state}")
+    #print(f"scroll_x: {scroll_x}, scroll_y: {scroll_y}, boss_health: {boss_health}, game_state: {game_state}")
 
     #set the game state
     if(current_state == "UNKOWN"):    
@@ -286,21 +284,24 @@ def determine_game_state(data_after, current_state):
 
     #check to break the current game state
     else:
-        conditions = [game_state == 6]
+        if(game_state == 6):
+            GAME_STATES[STATE_MAP["UNKOWN"]]
 
-        if(current_state == "HORIZONTAL-RIGHT"):
-            conditions.append(scroll_x > 76)
-        elif(current_state == "HORIZONTAL-LEFT"):
-            conditions.append(scroll_x < 68)
-        elif(current_state == "VERTICAL-UP"):
-            conditions.append(scroll_y < 76)
-        elif(current_state == "VERTICAL-DOWN"):
-            conditions.append(scroll_y > 84)
-        elif(current_state == "BOSS"):
-            conditions.append(boss_health == 0)
+        conditions = [False]
+
+        #if(current_state == "HORIZONTAL-RIGHT"):
+        #    conditions.append(scroll_x > 76)
+        #elif(current_state == "HORIZONTAL-LEFT"):
+        #    conditions.append(scroll_x < 68)
+        #elif(current_state == "VERTICAL-UP"):
+        #    conditions.append(scroll_y < 76)
+        #elif(current_state == "VERTICAL-DOWN"):
+        #    conditions.append(scroll_y > 84)
+        #elif(current_state == "BOSS"):
+        #    conditions.append(boss_health == 0)
         
-        if(any(conditions)):
-            current_state = GAME_STATES[STATE_MAP["UNKOWN"]]
+        #if(any(conditions)):
+        #    current_state = GAME_STATES[STATE_MAP["DOOR-PRESENT"]]
 
     #set door present
     if(current_state != "UNKOWN"):
@@ -345,9 +346,15 @@ def good_move(data_before, data_after, current_state):
         #going in the down direction is a good move, and standing in place is not a good move
         conditions.append(scroll_y_after > 76 and x_before != x_after) #y_before != y_after)
         
-    elif(current_state == "BOSS" or current_state == "DOOR_PRESENT"):
+    elif(current_state == "BOSS"):
         #standing in place is a bad move
         conditions.append(x_before != x_after) #y_before != y_after)
+
+    elif(current_state == "DOOR-PRESENT"):
+        #standing in place is a bad move
+        conditions.append(x_before != x_after)
+        conditions.append(scroll_x_after > 68)
+        
 
     return all(conditions)
 

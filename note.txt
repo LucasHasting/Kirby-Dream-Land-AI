@@ -1,0 +1,3 @@
+data = [[a, b, c, d], [a, b, c, d], ... [health]]
+
+bad move = kirby loose health, kirby loose life
