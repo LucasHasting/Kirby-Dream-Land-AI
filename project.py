@@ -3,6 +3,14 @@ import numpy as np
 from sklearn import linear_model
 import random
 import time
+import tkinter as tk
+
+'''
+https://www.geeksforgeeks.org/how-to-clear-out-a-frame-in-the-tkinter/
+https://www.geeksforgeeks.org/python-gui-tkinter/
+https://stackoverflow.com/questions/6920302/how-to-pass-arguments-to-a-button-command-in-tkinter
+https://stackoverflow.com/questions/110923/how-do-i-close-a-tkinter-window
+'''
 
 #set the frames per second
 FPS = 60
@@ -61,14 +69,120 @@ STATE_MAP = {
     "DOOR-PRESENT": 6
 }
 
-#function is a renderer that uses the FPS to determine speed
-def new_render(env):
-    time.sleep(1/FPS)
-    env.render()
-
-#main driver
 def main():
+    m = tk.Tk()
+    main_menu(m)
+
+def main_menu(m):
+    button_1 = tk.Button(m, text='AI - Create data (play the first screen)', width=50, command=lambda: screen_one_play_file_gui(m))
+    button_1.pack()
+    button_2 = tk.Button(m, text='AI - Create data (play the full game - not finished)', width=50, command=lambda: game_driver(m))
+    button_2.pack()
+    button_3 = tk.Button(m, text='AI - Test Model (first screen only)', width=50, command=m.destroy)
+    button_3.pack()
+    button_4 = tk.Button(m, text='Record Gameplay - Human (first screen only)', width=50, command=m.destroy)
+    button_4.pack()
+    button_5 = tk.Button(m, text='Playback a recording', width=50, command=lambda: playback_gui(m))
+    button_5.pack()
+    button_6 = tk.Button(m, text='Quit', width=25, command=m.destroy)
+    button_6.pack()
+    m.mainloop()
+
+def screen_one_play_file_gui(m):
+    incorrect_count = [0]
+    m.destroy()
+    m = tk.Tk()
+    label_1 = tk.Label(m, text="Enter data file: ")
+    label_1.pack()
+    text_1 = tk.Text(m, height=1, width=30)
+    text_1.pack()
+    label_2 = tk.Label(m, text="Enter move file: ")
+    label_2.pack()
+    text_2 = tk.Text(m, height=1, width=30)
+    text_2.pack()
+    button = tk.Button(m, text='Play the game!', width=25, command=lambda: screen_one_play_file_gui_validate(m, text_1, text_2, incorrect_count))
+    button.pack()
+    m.mainloop()
+
+def screen_one_play_file_gui_validate(m, text_1, text_2, incorrect_count):
+    if((text_1.get("1.0") == "\n" or text_2.get("1.0") == "\n") and incorrect_count[0] == 0):
+        label = tk.Label(m, text="Please enter a file name!")
+        label.pack()
+        incorrect_count[0] += 1
+    elif (text_1.get("1.0") != "\n" and text_2.get("1.0") != "\n"):
+        game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True)
+
+def playback_gui(m):
+    incorrect_count = [0]
+    m.destroy()
+    m = tk.Tk()
+    label = tk.Label(m, text="Enter move file: ")
+    label.pack()
+    text = tk.Text(m, height=1, width=30)
+    text.pack()
+    button = tk.Button(m, text='Watch the game!', width=25, command=lambda: playback_gui_validate(m, text, incorrect_count))
+    button.pack()
+    m.mainloop()
+
+def playback_gui_validate(m, text, incorrect_count):
+    if(text.get("1.0") == "\n" and incorrect_count[0] == 0):
+        label = tk.Label(m, text="Please enter a file name!")
+        label.pack()
+        incorrect_count[0] += 1
+    elif (text.get("1.0") != "\n"):
+        playback_driver(m, text.get("1.0", "end-1c").strip())
+
+def get_data_from_file(file):
+    data = []
+
+    for line in file:
+        line = line.split(",")
+        line[0] = int(line[0])
+        line[1] = int(line[1])
+        data.append(line)
+
+    return data
+    
+def playback_driver(m, text):
+    m.destroy()
+    move_data = get_data_from_file(open(text, "r"))
+    moves = [x for x in (move[0] for move in move_data)]
+    move_frames = [move[1] for move in move_data]
+
+    env = retro.make('KirbysDreamLand-GB', STATE_FILE)
+    env.reset()
+    
+    while(len(move_frames) != 0):
+        
+        #render the game
+        new_render(env)
+
+        move_size = move_frames[0]
+        action = INVERSE_INPUTS[moves[0]]
+
+        for i in range(move_size):
+            new_render(env)
+            ob, rew, done, info = env.step(make_action(action))
+
+        move_frames.pop(0)
+        moves.pop(0)
+
+    env.render(close=True)
+    env.close()
+    
+    m = tk.Tk()
+    main_menu(m)
+
+def game_driver(m, text_1 = "", text_2 = "", screen_one=False):
+    m.destroy()
     current_state = GAME_STATES[0]
+    data_file = 0
+    move_file = 0
+
+    #if first screen only, open data file for writing
+    if(screen_one):
+        data_file = open(text_1, "w")
+        move_file = open(text_2, "w")
     
     #create the enviornment
     env = retro.make('KirbysDreamLand-GB', STATE_FILE)
@@ -91,6 +205,9 @@ def main():
         #have kirby do nothing to get screen info
         ob, rew, done, info = env.step(make_action("NULL"))
 
+        if(screen_one and info["game_state"] == 6):
+            break
+
         #get the current state and its data
         state = env.em.get_state()
         before = load_data(info, STATE_MAP[current_state])
@@ -102,6 +219,37 @@ def main():
         else:
             #make a good move if the model is created
             model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)
+
+    write_data_file(data_file, move_file, total_data, moves, move_sizes)
+
+    env.render(close=True)
+    env.close()
+
+    m = tk.Tk()
+    main_menu(m)
+
+def write_data_file(file_1, file_2, data1, data2, data3):
+    all_length = len(data1)
+    for i in range(all_length):
+        for j in range(len(data1[0])):
+            file_1.write(str(data1[i][j]) + ",")
+
+        file_1.write(str(data2[i]) + "\n")
+        file_2.write(str(data2[i]) + ",")
+        file_2.write(str(data3[i] * 2) + "\n")
+
+    file_1.close()
+    file_2.close()
+
+def clear_all_inside_frame_tk(frame):
+    # Iterate through every widget inside the frame
+    for widget in frame.winfo_children():
+        widget.destroy()  # deleting widget
+
+#function is a renderer that uses the FPS to determine speed
+def new_render(env):
+    time.sleep(1/FPS)
+    env.render()
 
 #function used to make an action (player input)
 def make_action(enter):
