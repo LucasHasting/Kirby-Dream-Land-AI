@@ -15,7 +15,7 @@ https://stackoverflow.com/questions/110923/how-do-i-close-a-tkinter-window
 #set the frames per second
 FPS = 60
 SLEEP_TIME = 1/4
-MIN_MOVE_SIZE = 30
+MIN_MOVE_SIZE = 15 #30
 MAN_MOVE_SIZE = 60
 
 #pit.state
@@ -69,6 +69,9 @@ STATE_MAP = {
     "DOOR-PRESENT": 6
 }
 
+def human_play_game(m):
+    m.destroy()
+
 def main():
     m = tk.Tk()
     main_menu(m)
@@ -78,7 +81,7 @@ def main_menu(m):
     button_1.pack()
     button_2 = tk.Button(m, text='AI - Create data (play the full game - not finished)', width=50, command=lambda: game_driver(m))
     button_2.pack()
-    button_3 = tk.Button(m, text='AI - Test Model (first screen only)', width=50, command=m.destroy)
+    button_3 = tk.Button(m, text='AI - Test Model (first screen only)', width=50, command=lambda: test_model_gui(m))
     button_3.pack()
     button_4 = tk.Button(m, text='Record Gameplay - Human (first screen only)', width=50, command=m.destroy)
     button_4.pack()
@@ -132,14 +135,60 @@ def playback_gui_validate(m, text, incorrect_count):
     elif (text.get("1.0") != "\n"):
         playback_driver(m, text.get("1.0", "end-1c").strip())
 
-def get_data_from_file(file):
-    data = []
+def test_model_gui(m):
+    incorrect_count = [0]
+    m.destroy()
+    m = tk.Tk()
+    label_1 = tk.Label(m, text="Enter data file: ")
+    label_1.pack()
+    text_1 = tk.Text(m, height=1, width=30)
+    text_1.pack()
+    label_2 = tk.Label(m, text="Enter move file: ")
+    label_2.pack()
+    text_2 = tk.Text(m, height=1, width=30)
+    text_2.pack()
+    button = tk.Button(m, text='Test the model!', width=25, command=lambda: test_model_gui_validate(m, text_1, text_2, incorrect_count))
+    button.pack()
+    m.mainloop()
 
+def test_model_gui_validate(m, text_1, text_2, incorrect_count):
+    if((text_1.get("1.0") == "\n" or text_2.get("1.0") == "\n") and incorrect_count[0] == 0):
+        label = tk.Label(m, text="Please enter a file name!")
+        label.pack()
+        incorrect_count[0] += 1
+    elif (text_1.get("1.0") != "\n" and text_2.get("1.0") != "\n"):
+        game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True, True)
+
+def result_gui(m, incorrect, total):
+    m.destroy()
+    m = tk.Tk()
+    label = tk.Label(m, text=f"{(((total - incorrect) / total) * 100):.2f}% accurate")
+    label.pack()
+    button = tk.Button(m, text='Return to main menu', width=25, command=lambda: transition_main_menu(m))
+    button.pack()
+    m.mainloop()
+
+def transition_main_menu(m):
+    m.destroy()
+    m = tk.Tk()
+    main_menu(m)
+
+def get_data_from_file(file, total_data=False):
+    data = []
+    
     for line in file:
         line = line.split(",")
-        line[0] = int(line[0])
-        line[1] = int(line[1])
-        data.append(line)
+
+        length = len(line)
+
+        if(total_data):
+            length = len(line) - 1
+        
+        for j in range(length):
+            line[j] = int(line[j])
+        data.append(line[:length])
+
+    file.close()
 
     return data
     
@@ -147,7 +196,7 @@ def playback_driver(m, text):
     m.destroy()
     move_data = get_data_from_file(open(text, "r"))
     moves = [x for x in (move[0] for move in move_data)]
-    move_frames = [move[1] for move in move_data]
+    move_frames = [x for x in (move[1] for move in move_data)]
 
     env = retro.make('KirbysDreamLand-GB', STATE_FILE)
     env.reset()
@@ -173,14 +222,15 @@ def playback_driver(m, text):
     m = tk.Tk()
     main_menu(m)
 
-def game_driver(m, text_1 = "", text_2 = "", screen_one=False):
+def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False):
     m.destroy()
     current_state = GAME_STATES[0]
     data_file = 0
     move_file = 0
+    incorrect = [0]
 
     #if first screen only, open data file for writing
-    if(screen_one):
+    if(screen_one and not test_model):
         data_file = open(text_1, "w")
         move_file = open(text_2, "w")
     
@@ -195,7 +245,17 @@ def game_driver(m, text_1 = "", text_2 = "", screen_one=False):
 
     model = 0
     move_size_model = 0
-    
+
+    if(test_model):
+        data_file = open(text_1, "r")
+        move_file = open(text_2, "r")
+        total_data = get_data_from_file(data_file, True)
+        move_data = get_data_from_file(move_file)
+        moves = [x for x in (move[0] for move in move_data)]
+        move_frames = [x/2 for x in (move[1] for move in move_data)]
+        model = update_model(total_data, moves)
+        move_size_model = update_move_size_model(moves, move_frames)
+        
     #play the game
     while(True):
         
@@ -214,19 +274,29 @@ def game_driver(m, text_1 = "", text_2 = "", screen_one=False):
 
         #if a model has not been created
         if(model == 0 or current_state == "UNKOWN"):
-            #get the current state and make a random move until it is good
-            model, move_size_model, current_state = make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)
+            if(test_model):
+                model, move_size_model, current_state = make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True)
+            else:
+                #get the current state and make a random move until it is good
+                model, move_size_model, current_state = make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)
         else:
-            #make a good move if the model is created
-            model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)
+            if(not test_model):
+                model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)  
+            else:
+                #make a good move if the model is created
+                model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, incorrect, True)
 
-    write_data_file(data_file, move_file, total_data, moves, move_sizes)
+    if(not test_model):
+        write_data_file(data_file, move_file, total_data, moves, move_sizes)
 
     env.render(close=True)
     env.close()
 
     m = tk.Tk()
-    main_menu(m)
+    if(test_model):
+        result_gui(m, incorrect[0], len(total_data))
+    else:
+        main_menu(m)
 
 def write_data_file(file_1, file_2, data1, data2, data3):
     all_length = len(data1)
@@ -240,11 +310,6 @@ def write_data_file(file_1, file_2, data1, data2, data3):
 
     file_1.close()
     file_2.close()
-
-def clear_all_inside_frame_tk(frame):
-    # Iterate through every widget inside the frame
-    for widget in frame.winfo_children():
-        widget.destroy()  # deleting widget
 
 #function is a renderer that uses the FPS to determine speed
 def new_render(env):
@@ -316,7 +381,7 @@ def make_random_movement(action, env):
     return ob, rew, done, info, move_size
 
 #function used to make a predicted move
-def make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state):
+def make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, incorrect=[0], test_model=False):
 
     #predict what move should be made 
     move = model.predict([before])
@@ -336,17 +401,19 @@ def make_move(info, model, total_data, moves, state, env, move_size_model, move_
 
     #determine if the move was good, if so, update the model. Otherwise, try a random move until a good move occurs
     if(good_move([before[-2], before[-1], before[-3], before[-4], before[-5], before[-6]], [after[-2], after[-1], after[-3], after[-4], after[-5], before[-6]], current_state)):
-       add_to_data(total_data, after, moves, move, move_sizes, move_size)
-       model = update_model(total_data, moves)
-       move_size_model = update_move_size_model(moves, move_sizes)
+        if(not test_model):
+           add_to_data(total_data, after, moves, move, move_sizes, move_size)
+           model = update_model(total_data, moves)
+           move_size_model = update_move_size_model(moves, move_sizes)
     else:
-        return make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)
+        incorrect[0] += 1
+        return make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, test_model)
 
     #return both models to be updated in the driver
     return model, move_size_model, current_state
 
 #function used to make a random move
-def make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state):
+def make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, test_model=False):
     #load the previous state
     env.em.set_state(state)
 
@@ -367,12 +434,13 @@ def make_random_move(info, model, total_data, moves, state, env, move_size_model
 
     #determine if the move was good, if so, update the model. Otherwise, try again 
     if(good_move([before[-2], before[-1], before[-3], before[-4], before[-5], before[-6]], [after[-2], after[-1], after[-3], after[-4], after[-5], before[-6]], current_state)):
-       add_to_data(total_data, after, moves, INPUTS[move], move_sizes, move_size)
-       model = update_model(total_data, moves)
-       move_size_model = update_move_size_model(moves, move_sizes)
+        if(not test_model):
+           add_to_data(total_data, after, moves, INPUTS[move], move_sizes, move_size)
+           model = update_model(total_data, moves)
+           move_size_model = update_move_size_model(moves, move_sizes)
     else:
         #use recursion to try again
-        return make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)
+        return make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, test_model)
 
     #return both models to be updated in the driver
     return model, move_size_model, current_state
