@@ -15,24 +15,22 @@ https://stackoverflow.com/questions/110923/how-do-i-close-a-tkinter-window
 #set the frames per second
 FPS = 60
 SLEEP_TIME = 1/4
-MIN_MOVE_SIZE = 15 #30
+MIN_MOVE_SIZE = 15 
 MAN_MOVE_SIZE = 60
 
-#pit.state
-#begginning.state
-#door.state
-#boss.state
 STATE_FILE = "begginning.state"
 
 #create map of inputs to position in action array
 INPUTS = {
     "A": 8,
-    "B": 0, 
+    "B": 0,
     "UP": 4,
     "DOWN": 5,
     "LEFT": 6,
     "RIGHT": 7,
-    "NULL": -1, 
+    "NULL": -1,
+    "DOWN-LEFT": 1,
+    "DOWN-RIGHT": 9,
     "UP-LEFT": 2,
     "UP-RIGHT": 3
     #unknown: 1, 2, 3
@@ -47,6 +45,8 @@ INVERSE_INPUTS = {
     6: "LEFT",
     7: "RIGHT",
     -1: "NULL",
+    1: "DOWN-LEFT",
+    9: "DOWN-RIGHT",
     2: "UP-LEFT",
     3: "UP-RIGHT"
 }
@@ -71,19 +71,20 @@ STATE_MAP = {
 
 def human_play_game(m):
     m.destroy()
+    
 
 def main():
     m = tk.Tk()
     main_menu(m)
 
 def main_menu(m):
-    button_1 = tk.Button(m, text='AI - Create data (play the first screen)', width=50, command=lambda: screen_one_play_file_gui(m))
+    button_1 = tk.Button(m, text='AI - Create data (play the first screen)', width=50, command=lambda: two_file_gui(m, 'Play the game!', "Screen One"))
     button_1.pack()
-    button_2 = tk.Button(m, text='AI - Create data (play the full game - not finished)', width=50, command=lambda: game_driver(m))
+    button_2 = tk.Button(m, text='AI - Create data (play the full game - not finished)', width=50, command=lambda: two_file_gui(m, 'Play the game!', "Full Game"))
     button_2.pack()
-    button_3 = tk.Button(m, text='AI - Test Model (first screen only)', width=50, command=lambda: test_model_gui(m))
+    button_3 = tk.Button(m, text='AI - Test Model (first screen only)', width=50, command=lambda: two_file_gui(m, 'Test the model!', "Test Model"))
     button_3.pack()
-    button_4 = tk.Button(m, text='Record Gameplay - Human (first screen only)', width=50, command=m.destroy)
+    button_4 = tk.Button(m, text='AI - Improve Model (first screen only)', width=50, command=lambda: two_file_gui(m, 'Play the game!', "I - Screen One"))
     button_4.pack()
     button_5 = tk.Button(m, text='Playback a recording', width=50, command=lambda: playback_gui(m))
     button_5.pack()
@@ -91,7 +92,7 @@ def main_menu(m):
     button_6.pack()
     m.mainloop()
 
-def screen_one_play_file_gui(m):
+def two_file_gui(m, message, t):
     incorrect_count = [0]
     m.destroy()
     m = tk.Tk()
@@ -103,17 +104,24 @@ def screen_one_play_file_gui(m):
     label_2.pack()
     text_2 = tk.Text(m, height=1, width=30)
     text_2.pack()
-    button = tk.Button(m, text='Play the game!', width=25, command=lambda: screen_one_play_file_gui_validate(m, text_1, text_2, incorrect_count))
+    button = tk.Button(m, text=message, width=25, command=lambda: two_file_validate_gui(m, text_1, text_2, incorrect_count, t))
     button.pack()
     m.mainloop()
 
-def screen_one_play_file_gui_validate(m, text_1, text_2, incorrect_count):
+def two_file_validate_gui(m, text_1, text_2, incorrect_count, t):
     if((text_1.get("1.0") == "\n" or text_2.get("1.0") == "\n") and incorrect_count[0] == 0):
         label = tk.Label(m, text="Please enter a file name!")
         label.pack()
         incorrect_count[0] += 1
     elif (text_1.get("1.0") != "\n" and text_2.get("1.0") != "\n"):
-        game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True)
+        if(t=="Full Game"):
+            game_driver(m)
+        if(t=="Screen One"):
+            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True)
+        elif(t=="Test Model"):
+            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True, True)
+        elif(t=="I - Screen One"):
+            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True, False, True)
 
 def playback_gui(m):
     incorrect_count = [0]
@@ -134,30 +142,6 @@ def playback_gui_validate(m, text, incorrect_count):
         incorrect_count[0] += 1
     elif (text.get("1.0") != "\n"):
         playback_driver(m, text.get("1.0", "end-1c").strip())
-
-def test_model_gui(m):
-    incorrect_count = [0]
-    m.destroy()
-    m = tk.Tk()
-    label_1 = tk.Label(m, text="Enter data file: ")
-    label_1.pack()
-    text_1 = tk.Text(m, height=1, width=30)
-    text_1.pack()
-    label_2 = tk.Label(m, text="Enter move file: ")
-    label_2.pack()
-    text_2 = tk.Text(m, height=1, width=30)
-    text_2.pack()
-    button = tk.Button(m, text='Test the model!', width=25, command=lambda: test_model_gui_validate(m, text_1, text_2, incorrect_count))
-    button.pack()
-    m.mainloop()
-
-def test_model_gui_validate(m, text_1, text_2, incorrect_count):
-    if((text_1.get("1.0") == "\n" or text_2.get("1.0") == "\n") and incorrect_count[0] == 0):
-        label = tk.Label(m, text="Please enter a file name!")
-        label.pack()
-        incorrect_count[0] += 1
-    elif (text_1.get("1.0") != "\n" and text_2.get("1.0") != "\n"):
-        game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True, True)
 
 def result_gui(m, incorrect, total):
     m.destroy()
@@ -191,10 +175,15 @@ def get_data_from_file(file, total_data=False):
     file.close()
 
     return data
-    
+
+def human_driver(m):
+    m.destroy()
+    env = retro.make('KirbysDreamLand-GB', STATE_FILE)
+    env.reset()
+
 def playback_driver(m, text):
     m.destroy()
-    move_data = get_data_from_file(open(text, "r"))
+    move_data = get_data_from_file(open("./data/"+text, "r"))
     moves = [x for x in (move[0] for move in move_data)]
     move_frames = [x for x in (move[1] for move in move_data)]
 
@@ -222,7 +211,7 @@ def playback_driver(m, text):
     m = tk.Tk()
     main_menu(m)
 
-def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False):
+def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False, improve_model=False):
     m.destroy()
     current_state = GAME_STATES[0]
     data_file = 0
@@ -231,8 +220,8 @@ def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False)
 
     #if first screen only, open data file for writing
     if(screen_one and not test_model):
-        data_file = open(text_1, "w")
-        move_file = open(text_2, "w")
+        data_file = open("./data/"+text_1, "w")
+        move_file = open("./data/"+text_2, "w")
     
     #create the enviornment
     env = retro.make('KirbysDreamLand-GB', STATE_FILE)
@@ -246,9 +235,9 @@ def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False)
     model = 0
     move_size_model = 0
 
-    if(test_model):
-        data_file = open(text_1, "r")
-        move_file = open(text_2, "r")
+    if(test_model or improve_model):
+        data_file = open("./data/"+text_1, "r")
+        move_file = open("./data/"+text_2, "r")
         total_data = get_data_from_file(data_file, True)
         move_data = get_data_from_file(move_file)
         moves = [x for x in (move[0] for move in move_data)]
@@ -275,16 +264,16 @@ def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False)
         #if a model has not been created
         if(model == 0 or current_state == "UNKOWN"):
             if(test_model):
-                model, move_size_model, current_state = make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True)
+                model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True, incorrect, True)
             else:
                 #get the current state and make a random move until it is good
-                model, move_size_model, current_state = make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)
+                model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True)
         else:
             if(not test_model):
                 model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)  
             else:
                 #make a good move if the model is created
-                model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, incorrect, True)
+                model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, False, incorrect, True)
 
     if(not test_model):
         write_data_file(data_file, move_file, total_data, moves, move_sizes)
@@ -319,11 +308,17 @@ def new_render(env):
 #function used to make an action (player input)
 def make_action(enter):
     action = [0] * 9
-    if(INPUTS[enter] == 2):
+    if(INPUTS[enter] == 1):
+        action[5] = 1
+        action[6] = 1
+    elif(INPUTS[enter] == 2):
         action[4] = 1
         action[6] = 1
     elif(INPUTS[enter] == 3):
         action[4] = 1
+        action[7] = 1
+    elif(INPUTS[enter] == 9):
+        action[5] = 1
         action[7] = 1
     elif(INPUTS[enter] == -1):
         pass
@@ -354,23 +349,13 @@ def load_data(info, current_state):
     return [*screen_data, current_state, game_state, boss_health, kirby_life, kirby_health, kirby_y, kirby_y_scrol, kirby_x_scrol, kirby_x]
 
 #make a movement based on move predicited, predicts how long a move should be held
-def make_movement(action, env, move_size_model):
+def make_movement(action, env, move_size_model, random_move=False):
     #predict move size
-    move_size = move_size_model.predict([[INPUTS[action]]])
-    move_size = round(move_size[0])
-
-    #perform the move for move_size frames
-    for i in range(move_size):
-        new_render(env)
-        ob, rew, done, info = env.step(make_action(action))
-
-    #return info needed from making an action
-    return ob, rew, done, info, move_size
-
-#make a movement based on move predicited, has a random move size
-def make_random_movement(action, env):
-    #get random move size
-    move_size = random.randrange(MIN_MOVE_SIZE, MAN_MOVE_SIZE)
+    if(random_move):
+        move_size = random.randrange(MIN_MOVE_SIZE, MAN_MOVE_SIZE)
+    else:
+        move_size = move_size_model.predict([[INPUTS[action]]])
+        move_size = round(move_size[0])
 
     #perform the move for move_size frames
     for i in range(move_size):
@@ -381,15 +366,29 @@ def make_random_movement(action, env):
     return ob, rew, done, info, move_size
 
 #function used to make a predicted move
-def make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, incorrect=[0], test_model=False):
+def make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, random_move = False, incorrect=[0], test_model=False):
+    if(random_move):
+        #load the previous state
+        env.em.set_state(state)
+        
+    ob, rew, done, info, move_size = 0,0,0,0,0
 
-    #predict what move should be made 
-    move = model.predict([before])
-    move = move[0]
+    #predict what move should be made
+    if(random_move):
+        move = random.randrange(0, 10)
+        while(current_state == "HORIZONTAL-RIGHT" and "LEFT" in INVERSE_INPUTS[move]):
+            move = random.randrange(0, 10)
+    else:
+        move = model.predict([before])
+        move = move[0]
 
     #try two moves - account for pits
-    make_movement(INVERSE_INPUTS[move], env, move_size_model)
-    ob, rew, done, info, move_size = make_movement(INVERSE_INPUTS[move], env, move_size_model)
+    if(random_move):
+        make_movement(INVERSE_INPUTS[move], env, 0, True)
+        ob, rew, done, info, move_size = make_movement(INVERSE_INPUTS[move], env, 0, True)
+    else:
+        make_movement(INVERSE_INPUTS[move], env, move_size_model)
+        ob, rew, done, info, move_size = make_movement(INVERSE_INPUTS[move], env, move_size_model)
     time.sleep(SLEEP_TIME)
 
     #load data after the move was made
@@ -397,7 +396,10 @@ def make_move(info, model, total_data, moves, state, env, move_size_model, move_
 
     #check game state
     current_state = determine_game_state([before[-2], before[-3], before[-7], before[-8]], current_state)
-    print("Predicted: ", INVERSE_INPUTS[move], move_size, current_state)
+    if(random_move):
+        print(INVERSE_INPUTS[move], move_size, current_state)
+    else:
+        print("Predicted: ", INVERSE_INPUTS[move], move_size, current_state)
 
     #determine if the move was good, if so, update the model. Otherwise, try a random move until a good move occurs
     if(good_move([before[-2], before[-1], before[-3], before[-4], before[-5], before[-6]], [after[-2], after[-1], after[-3], after[-4], after[-5], before[-6]], current_state)):
@@ -406,41 +408,9 @@ def make_move(info, model, total_data, moves, state, env, move_size_model, move_
            model = update_model(total_data, moves)
            move_size_model = update_move_size_model(moves, move_sizes)
     else:
-        incorrect[0] += 1
-        return make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, test_model)
-
-    #return both models to be updated in the driver
-    return model, move_size_model, current_state
-
-#function used to make a random move
-def make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, test_model=False):
-    #load the previous state
-    env.em.set_state(state)
-
-    #make a random move
-    move = INVERSE_INPUTS[random.randrange(2, 10) % 9]
-
-    #try two moves - account for pits
-    make_random_movement(move, env)
-    ob, rew, done, info, move_size = make_random_movement(move, env)
-    time.sleep(SLEEP_TIME)
-
-    #load data after the move was made
-    after = load_data(info, STATE_MAP[current_state])
-
-    #check game state
-    current_state = determine_game_state([after[-2], after[-3], after[-7], after[-8]], current_state)
-    print(move, move_size, current_state)
-
-    #determine if the move was good, if so, update the model. Otherwise, try again 
-    if(good_move([before[-2], before[-1], before[-3], before[-4], before[-5], before[-6]], [after[-2], after[-1], after[-3], after[-4], after[-5], before[-6]], current_state)):
-        if(not test_model):
-           add_to_data(total_data, after, moves, INPUTS[move], move_sizes, move_size)
-           model = update_model(total_data, moves)
-           move_size_model = update_move_size_model(moves, move_sizes)
-    else:
-        #use recursion to try again
-        return make_random_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, test_model)
+        if(not random_move):
+            incorrect[0] += 1
+        return make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True, incorrect, test_model)
 
     #return both models to be updated in the driver
     return model, move_size_model, current_state
@@ -504,20 +474,6 @@ def determine_game_state(data_after, current_state):
             GAME_STATES[STATE_MAP["UNKOWN"]]
 
         conditions = [False]
-
-        #if(current_state == "HORIZONTAL-RIGHT"):
-        #    conditions.append(scroll_x > 76)
-        #elif(current_state == "HORIZONTAL-LEFT"):
-        #    conditions.append(scroll_x < 68)
-        #elif(current_state == "VERTICAL-UP"):
-        #    conditions.append(scroll_y < 76)
-        #elif(current_state == "VERTICAL-DOWN"):
-        #    conditions.append(scroll_y > 84)
-        #elif(current_state == "BOSS"):
-        #    conditions.append(boss_health == 0)
-        
-        #if(any(conditions)):
-        #    current_state = GAME_STATES[STATE_MAP["DOOR-PRESENT"]]
 
     #set door present
     if(current_state != "UNKOWN"):
