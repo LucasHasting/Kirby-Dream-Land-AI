@@ -6,6 +6,10 @@ import time
 import tkinter as tk
 
 '''
+Name: Lucas Hasting
+Date: 11/20/2024
+
+Sources:
 https://www.geeksforgeeks.org/how-to-clear-out-a-frame-in-the-tkinter/
 https://www.geeksforgeeks.org/python-gui-tkinter/
 https://stackoverflow.com/questions/6920302/how-to-pass-arguments-to-a-button-command-in-tkinter
@@ -14,10 +18,15 @@ https://stackoverflow.com/questions/110923/how-do-i-close-a-tkinter-window
 
 #set the frames per second
 FPS = 60
-SLEEP_TIME = 1/4
-MIN_MOVE_SIZE = 15 
-MAN_MOVE_SIZE = 60
 
+#set the sleep time - used to ensure all data is read before making checking a good move
+SLEEP_TIME = 1/4
+
+#set the min and max allowed frame sizes for making random move sizes
+MIN_MOVE_SIZE = 30 
+MAN_MOVE_SIZE = 75
+
+#the starting game state
 STATE_FILE = "begginning.state"
 
 #create map of inputs to position in action array
@@ -51,6 +60,7 @@ INVERSE_INPUTS = {
     3: "UP-RIGHT"
 }
 
+#create list of states
 GAME_STATES = ["UNKOWN",
                "HORIZONTAL-RIGHT",
                "HORIZONTAL-LEFT",
@@ -59,6 +69,7 @@ GAME_STATES = ["UNKOWN",
                "BOSS",
                "DOOR-PRESENT"]
 
+#create map of states to state index
 STATE_MAP = {
     "UNKOWN": 0,
     "HORIZONTAL-RIGHT": 1,
@@ -69,22 +80,21 @@ STATE_MAP = {
     "DOOR-PRESENT": 6
 }
 
-def human_play_game(m):
-    m.destroy()
-    
-
+#The main driver
 def main():
+    #display the main menu
     m = tk.Tk()
     main_menu(m)
 
+#function used to display a main menu GUI
 def main_menu(m):
-    button_1 = tk.Button(m, text='AI - Create data (play the first screen)', width=50, command=lambda: two_file_gui(m, 'Play the game!', "Screen One"))
+    button_1 = tk.Button(m, text='AI - Create data (play the first screen)', width=50, command=lambda: three_file_gui(m, 'Play the game!', "Screen One"))
     button_1.pack()
-    button_2 = tk.Button(m, text='AI - Create data (play the full game - not finished)', width=50, command=lambda: two_file_gui(m, 'Play the game!', "Full Game"))
+    button_2 = tk.Button(m, text='AI - Create data (play the full game - not finished)', width=50, command=lambda: three_file_gui(m, 'Play the game!', "Full Game"))
     button_2.pack()
     button_3 = tk.Button(m, text='AI - Test Model (first screen only)', width=50, command=lambda: two_file_gui(m, 'Test the model!', "Test Model"))
     button_3.pack()
-    button_4 = tk.Button(m, text='AI - Improve Model (first screen only)', width=50, command=lambda: two_file_gui(m, 'Play the game!', "I - Screen One"))
+    button_4 = tk.Button(m, text='AI - Improve Model (first screen only)', width=50, command=lambda: three_file_gui(m, 'Play the game!', "I - Screen One"))
     button_4.pack()
     button_5 = tk.Button(m, text='Playback a recording', width=50, command=lambda: playback_gui(m))
     button_5.pack()
@@ -92,49 +102,89 @@ def main_menu(m):
     button_6.pack()
     m.mainloop()
 
+#function used to display a GUI requesting two input files
 def two_file_gui(m, message, t):
     incorrect_count = [0]
     m.destroy()
     m = tk.Tk()
-    label_1 = tk.Label(m, text="Enter data file: ")
+    label_1 = tk.Label(m, text="Enter move type file: ")
     label_1.pack()
     text_1 = tk.Text(m, height=1, width=30)
     text_1.pack()
-    label_2 = tk.Label(m, text="Enter move file: ")
+    label_2 = tk.Label(m, text="Enter move size file: ")
     label_2.pack()
     text_2 = tk.Text(m, height=1, width=30)
     text_2.pack()
     button = tk.Button(m, text=message, width=25, command=lambda: two_file_validate_gui(m, text_1, text_2, incorrect_count, t))
     button.pack()
+    button_2 = tk.Button(m, text="Go Back", width=25, command=lambda: transition_main_menu(m))
+    button_2.pack()
     m.mainloop()
 
+#function used to validate a GUI requesting two input files
 def two_file_validate_gui(m, text_1, text_2, incorrect_count, t):
     if((text_1.get("1.0") == "\n" or text_2.get("1.0") == "\n") and incorrect_count[0] == 0):
         label = tk.Label(m, text="Please enter a file name!")
         label.pack()
         incorrect_count[0] += 1
     elif (text_1.get("1.0") != "\n" and text_2.get("1.0") != "\n"):
+        game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), "", True, True)
+
+#function used to display a GUI requesting three input files
+def three_file_gui(m, message, t):
+    incorrect_count = [0]
+    m.destroy()
+    m = tk.Tk()
+    label_1 = tk.Label(m, text="Enter move type file: ")
+    label_1.pack()
+    text_1 = tk.Text(m, height=1, width=30)
+    text_1.pack()
+    label_2 = tk.Label(m, text="Enter move size file: ")
+    label_2.pack()
+    text_2 = tk.Text(m, height=1, width=30)
+    text_2.pack()
+    label_3 = tk.Label(m, text="Enter recording file: ")
+    label_3.pack()
+    text_3 = tk.Text(m, height=1, width=30)
+    text_3.pack()
+    button = tk.Button(m, text=message, width=25, command=lambda: three_file_validate_gui(m, text_1, text_2, text_3, incorrect_count, t))
+    button.pack()
+    button_2 = tk.Button(m, text="Go Back", width=25, command=lambda: transition_main_menu(m))
+    button_2.pack()
+    m.mainloop()
+
+#function used to validate a GUI requesting three input files
+def three_file_validate_gui(m, text_1, text_2, text_3, incorrect_count, t):
+    if((text_1.get("1.0") == "\n" or text_2.get("1.0") == "\n" or text_3.get("1.0") == "\n") and incorrect_count[0] == 0):
+        label = tk.Label(m, text="Please enter a file name that exists!")
+        label.pack()
+        incorrect_count[0] += 1
+    elif (text_1.get("1.0") != "\n" and text_2.get("1.0") != "\n"):
         if(t=="Full Game"):
             game_driver(m)
         if(t=="Screen One"):
-            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True)
+            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), text_3.get("1.0", "end-1c").strip(), True)
         elif(t=="Test Model"):
-            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True, True)
+            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), text_3.get("1.0", "end-1c").strip(), True, True)
         elif(t=="I - Screen One"):
-            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), True, False, True)
+            game_driver(m, text_1.get("1.0", "end-1c").strip(), text_2.get("1.0", "end-1c").strip(), text_3.get("1.0", "end-1c").strip(), True, False, True)
 
+#function used to display a GUI requesting one input file - used to playback a recording
 def playback_gui(m):
     incorrect_count = [0]
     m.destroy()
     m = tk.Tk()
-    label = tk.Label(m, text="Enter move file: ")
+    label = tk.Label(m, text="Enter recording file: ")
     label.pack()
     text = tk.Text(m, height=1, width=30)
     text.pack()
     button = tk.Button(m, text='Watch the game!', width=25, command=lambda: playback_gui_validate(m, text, incorrect_count))
     button.pack()
+    button_2 = tk.Button(m, text="Go Back", width=25, command=lambda: transition_main_menu(m))
+    button_2.pack()
     m.mainloop()
 
+#function used to validate a GUI requesting one input file - used to playback a recording
 def playback_gui_validate(m, text, incorrect_count):
     if(text.get("1.0") == "\n" and incorrect_count[0] == 0):
         label = tk.Label(m, text="Please enter a file name!")
@@ -143,6 +193,7 @@ def playback_gui_validate(m, text, incorrect_count):
     elif (text.get("1.0") != "\n"):
         playback_driver(m, text.get("1.0", "end-1c").strip())
 
+#function used to display a GUI which displays the accuracy of the model
 def result_gui(m, incorrect, total):
     m.destroy()
     m = tk.Tk()
@@ -152,11 +203,13 @@ def result_gui(m, incorrect, total):
     button.pack()
     m.mainloop()
 
+#function used to transistion to the main menu GUI
 def transition_main_menu(m):
     m.destroy()
     m = tk.Tk()
     main_menu(m)
 
+#function used to get data from a file
 def get_data_from_file(file, total_data=False):
     data = []
     
@@ -165,6 +218,7 @@ def get_data_from_file(file, total_data=False):
 
         length = len(line)
 
+        #if total data, adjust the length of the line (account for move itself)
         if(total_data):
             length = len(line) - 1
         
@@ -176,54 +230,90 @@ def get_data_from_file(file, total_data=False):
 
     return data
 
-def human_driver(m):
-    m.destroy()
-    env = retro.make('KirbysDreamLand-GB', STATE_FILE)
-    env.reset()
+#function used to write the data to the data files
+def write_data_file(file_1, file_2, file_3, data1, data2, data3, improve_model, moves_size, recoring_file_name):
+    #write the data to the data files
+    all_length = len(data1)
+    for i in range(all_length):
+        for j in range(len(data1[0])):
+            file_1.write(str(data1[i][j]) + ",")
 
+        file_1.write(str(data2[i]) + "\n")
+        file_2.write(str(data2[i]) + ",")
+        file_2.write(str(data3[i]) + "\n")
+        if(not improve_model):
+            file_3.write(str(data2[i]) + ",")
+            file_3.write(str(int(data3[i])) + "\n")
+
+    #if the model is improved, save only the new moves made to the recording
+    if(improve_model):
+        moves = data2[moves_size:]
+        move_frames = data3[moves_size:]
+        for i in range(len(moves)):
+            file_3.write(str(moves[i]) + ",")
+            file_3.write(str(int(move_frames[i])) + "\n")
+
+    file_1.close()
+    file_2.close()
+    file_3.close()
+
+    #compress the recording file
+    compress_recording_file(recoring_file_name)
+
+#function used to playback a recording (the playback driver)
 def playback_driver(m, text):
     m.destroy()
-    move_data = get_data_from_file(open("./data/"+text, "r"))
+
+    #read in data from recording
+    file = open("./data/recordings/"+text, "r")
+    move_data = get_data_from_file(file)
     moves = [x for x in (move[0] for move in move_data)]
     move_frames = [x for x in (move[1] for move in move_data)]
+    file.close()
 
+    #start gym retro enviornment
     env = retro.make('KirbysDreamLand-GB', STATE_FILE)
     env.reset()
-    
+
+    #loop for every move
     while(len(move_frames) != 0):
         
         #render the game
         new_render(env)
 
+        #get move size and move type
         move_size = move_frames[0]
         action = INVERSE_INPUTS[moves[0]]
 
+        #perform the move
         for i in range(move_size):
             new_render(env)
             ob, rew, done, info = env.step(make_action(action))
 
+        #remove moves from the pipe
         move_frames.pop(0)
         moves.pop(0)
 
+    #close the gym retro enviornment
     env.render(close=True)
     env.close()
-    
+
+    #go to the main menun
     m = tk.Tk()
     main_menu(m)
 
-def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False, improve_model=False):
+#function used for all other drivers
+def game_driver(m, text_1 = "", text_2 = "", text_3 = "", screen_one=False, test_model=False, improve_model=False):
     m.destroy()
+
+    #initilize variables
     current_state = GAME_STATES[0]
     data_file = 0
     move_file = 0
+    recording_file = 0
     incorrect = [0]
-
-    #if first screen only, open data file for writing
-    if(screen_one and not test_model):
-        data_file = open("./data/"+text_1, "w")
-        move_file = open("./data/"+text_2, "w")
     
-    #create the enviornment
+    #create the gym retro enviornment
     env = retro.make('KirbysDreamLand-GB', STATE_FILE)
     env.reset()
 
@@ -235,15 +325,27 @@ def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False,
     model = 0
     move_size_model = 0
 
+    #get data if test_model or improve_mode
     if(test_model or improve_model):
-        data_file = open("./data/"+text_1, "r")
-        move_file = open("./data/"+text_2, "r")
+        data_file = open("./data/move_type_models/"+text_1, "r")
+        move_file = open("./data/move_size_models/"+text_2, "r")
         total_data = get_data_from_file(data_file, True)
         move_data = get_data_from_file(move_file)
         moves = [x for x in (move[0] for move in move_data)]
-        move_frames = [x/2 for x in (move[1] for move in move_data)]
+        move_sizes = [x for x in (move[1] for move in move_data)]
         model = update_model(total_data, moves)
-        move_size_model = update_move_size_model(moves, move_frames)
+        move_size_model = update_move_size_model(moves, move_sizes)
+        data_file.close()
+        move_file.close()
+
+    #if first screen only, open data file for writing
+    if((screen_one or improve_model) and not (test_model)):
+        data_file = open("./data/move_type_models/"+text_1, "w")
+        move_file = open("./data/move_size_models/"+text_2, "w")
+        recording_file = open("./data/recordings/"+text_3, "w")
+
+    #get move size (used for improve_model)
+    moves_size = len(moves)
         
     #play the game
     while(True):
@@ -254,6 +356,7 @@ def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False,
         #have kirby do nothing to get screen info
         ob, rew, done, info = env.step(make_action("NULL"))
 
+        #if a state of 6 is reached, end the game, the first screen has been reached
         if(screen_one and info["game_state"] == 6):
             break
 
@@ -263,44 +366,63 @@ def game_driver(m, text_1 = "", text_2 = "", screen_one=False, test_model=False,
 
         #if a model has not been created
         if(model == 0 or current_state == "UNKOWN"):
+            #get the current state and make a random move until it is good
             if(test_model):
                 model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True, incorrect, True)
             else:
-                #get the current state and make a random move until it is good
                 model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True)
         else:
+            #make a good move if the model is created
             if(not test_model):
                 model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state)  
             else:
-                #make a good move if the model is created
                 model, move_size_model, current_state = make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, False, incorrect, True)
 
+    #update data if the model was not being tested
     if(not test_model):
-        write_data_file(data_file, move_file, total_data, moves, move_sizes)
+        write_data_file(data_file, move_file, recording_file, total_data, moves, move_sizes, improve_model, moves_size, text_3)
 
+    #close the gym retro enviornment
     env.render(close=True)
     env.close()
 
+    #go to the next GUI
     m = tk.Tk()
     if(test_model):
         result_gui(m, incorrect[0], len(total_data))
     else:
         main_menu(m)
 
-def write_data_file(file_1, file_2, data1, data2, data3):
-    all_length = len(data1)
-    for i in range(all_length):
-        for j in range(len(data1[0])):
-            file_1.write(str(data1[i][j]) + ",")
+#function used to compress a recording file (combines adjacent frame sizes)
+def compress_recording_file(text):
+    #get the data from the recording file
+    file = open("./data/recordings/"+text, "r")
+    move_data = get_data_from_file(file)
+    moves = [x for x in (move[0] for move in move_data)]
+    move_frames = [x for x in (move[1] for move in move_data)]
+    file.close()
 
-        file_1.write(str(data2[i]) + "\n")
-        file_2.write(str(data2[i]) + ",")
-        file_2.write(str(data3[i] * 2) + "\n")
+    #get size and starting index
+    size = len(moves) - 1
+    i = 0
 
-    file_1.close()
-    file_2.close()
+    #loop through every frame option, if the adjacent frames are the same, combine frame sizes and adjust pipe arrays
+    while (i < size - 1):
+        if(moves[i] == moves[i+1]):
+            move_frames[i] += move_frames[i + 1]
+            move_frames.pop(i + 1)
+            moves.pop(i + 1)
+            size -= 1
+        i += 1
 
-#function is a renderer that uses the FPS to determine speed
+    #save the results in the recording file
+    file = open("./data/recordings/"+text, "w")
+    for i in range(len(moves)):
+            file.write(str(moves[i]) + ",")
+            file.write(str(move_frames[i]) + "\n")
+    file.close()
+    
+#function is a new renderer that uses the FPS to determine speed
 def new_render(env):
     time.sleep(1/FPS)
     env.render()
@@ -348,14 +470,18 @@ def load_data(info, current_state):
 
     return [*screen_data, current_state, game_state, boss_health, kirby_life, kirby_health, kirby_y, kirby_y_scrol, kirby_x_scrol, kirby_x]
 
-#make a movement based on move predicited, predicts how long a move should be held
-def make_movement(action, env, move_size_model, random_move=False):
-    #predict move size
+#function used perform a move
+def make_movement(action, env, move_size_model, state, random_move=False):
+
+    #predict move size, or get random move size
     if(random_move):
         move_size = random.randrange(MIN_MOVE_SIZE, MAN_MOVE_SIZE)
     else:
         move_size = move_size_model.predict([[INPUTS[action]]])
         move_size = round(move_size[0])
+
+    #load the state before moving
+    env.em.set_state(state)
 
     #perform the move for move_size frames
     for i in range(move_size):
@@ -365,15 +491,16 @@ def make_movement(action, env, move_size_model, random_move=False):
     #return info needed from making an action
     return ob, rew, done, info, move_size
 
-#function used to make a predicted move
+#function used to make a move
 def make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, random_move = False, incorrect=[0], test_model=False):
+    #load the previous state if the move is random
     if(random_move):
-        #load the previous state
         env.em.set_state(state)
-        
+
+    #give variables default values that will change later
     ob, rew, done, info, move_size = 0,0,0,0,0
 
-    #predict what move should be made
+    #decide what move to make (random or predicted)
     if(random_move):
         move = random.randrange(0, 10)
         while(current_state == "HORIZONTAL-RIGHT" and "LEFT" in INVERSE_INPUTS[move]):
@@ -382,19 +509,19 @@ def make_move(info, model, total_data, moves, state, env, move_size_model, move_
         move = model.predict([before])
         move = move[0]
 
-    #try two moves - account for pits
+    #make a move (random or predicted)
     if(random_move):
-        make_movement(INVERSE_INPUTS[move], env, 0, True)
-        ob, rew, done, info, move_size = make_movement(INVERSE_INPUTS[move], env, 0, True)
+        ob, rew, done, info, move_size = make_movement(INVERSE_INPUTS[move], env, 0, state, True)
     else:
-        make_movement(INVERSE_INPUTS[move], env, move_size_model)
-        ob, rew, done, info, move_size = make_movement(INVERSE_INPUTS[move], env, move_size_model)
+        ob, rew, done, info, move_size = make_movement(INVERSE_INPUTS[move], env, move_size_model, state)
+
+    #allow time for the data to be gathered (such as being hit)
     time.sleep(SLEEP_TIME)
 
     #load data after the move was made
     after = load_data(info, STATE_MAP[current_state])
 
-    #check game state
+    #check game state and display the current state along with the predicted move
     current_state = determine_game_state([before[-2], before[-3], before[-7], before[-8]], current_state)
     if(random_move):
         print(INVERSE_INPUTS[move], move_size, current_state)
@@ -403,16 +530,19 @@ def make_move(info, model, total_data, moves, state, env, move_size_model, move_
 
     #determine if the move was good, if so, update the model. Otherwise, try a random move until a good move occurs
     if(good_move([before[-2], before[-1], before[-3], before[-4], before[-5], before[-6]], [after[-2], after[-1], after[-3], after[-4], after[-5], before[-6]], current_state)):
+        #if a model is not being tested, update the current models
         if(not test_model):
            add_to_data(total_data, after, moves, move, move_sizes, move_size)
            model = update_model(total_data, moves)
            move_size_model = update_move_size_model(moves, move_sizes)
     else:
+        #if the move was bad and not random, the prediction was wrong (increase incorrect prediction count)
         if(not random_move):
             incorrect[0] += 1
+        #try a random move
         return make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True, incorrect, test_model)
 
-    #return both models to be updated in the driver
+    #return both models to be updated in the driver, along with the current state
     return model, move_size_model, current_state
 
 #add data to lists to be used in an updated model
@@ -423,11 +553,11 @@ def add_to_data(total_data, new_data, moves, move, move_sizes, move_size):
     
 #update the move prediciton model
 def update_model(total_data, moves):
-    #if there are not enough moves to make the model, return 0
+    #do not create a model if not enough data exists
     if(len(list(set(moves))) < 2):
         return 0
 
-    #make the move classification model
+    #make the move type classification model
     model = linear_model.LogisticRegression(solver='liblinear', C=1)
     model.fit(total_data, moves)
 
@@ -436,11 +566,11 @@ def update_model(total_data, moves):
 
 #update the move size prediciton model
 def update_move_size_model(moves, move_sizes):
-    #update the move size prediciton model
+    #do not create a model if not enough data exists
     if(len(list(set(moves))) < 2):
         return 0
 
-    #make the move classification model
+    #make the move size regression model
     move_size_model = linear_model.LinearRegression()
     temp_moves = [[i] for i in moves]
     move_size_model.fit(temp_moves, move_sizes)
@@ -449,11 +579,11 @@ def update_move_size_model(moves, move_sizes):
     return move_size_model
 
 def determine_game_state(data_after, current_state):
+    #put the data into more meaningfull variables
     scroll_x = data_after[0]
     scroll_y = data_after[1]
     boss_health = data_after[2]
     game_state = data_after[3]
-    #print(f"scroll_x: {scroll_x}, scroll_y: {scroll_y}, boss_health: {boss_health}, game_state: {game_state}")
 
     #set the game state
     if(current_state == "UNKOWN"):    
@@ -485,6 +615,7 @@ def determine_game_state(data_after, current_state):
 
 #function used to determine if a move was good based on present and future data
 def good_move(data_before, data_after, current_state):
+    #put the data into more meaningfull variables
     scroll_x_before = data_before[0]
     x_before = data_before[1]
     scroll_y_before = data_before[2]
@@ -499,6 +630,7 @@ def good_move(data_before, data_after, current_state):
     health_after = data_after[4]
     kirby_lives_after = data_after[5]
 
+    #conditions for all states
     conditions = [health_after == health_before, kirby_lives_after == kirby_lives_before,
                   scroll_x_after > 10, scroll_x_after < 152]
 
@@ -527,7 +659,7 @@ def good_move(data_before, data_after, current_state):
         conditions.append(x_before != x_after)
         conditions.append(scroll_x_after > 68)
         
-
+    #return true if all conditions for the state are true (it is a good move)
     return all(conditions)
 
 #run the driver
