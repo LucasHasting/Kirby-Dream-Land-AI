@@ -1,3 +1,10 @@
+'''
+Name: Lucas Hasting
+Date: 11/20/2024
+
+Source: https://datacrystal.tcrf.net/wiki/Kirby%27s_Dream_Land/RAM_map
+'''
+
 screen = 49152 # screen begining address
 
 i = 1
@@ -36,5 +43,3 @@ file += "\t}\n}"
 data_file = open('data.json', 'w')
 data_file.write(file)
 data_file.close()
-#print(file)
-#print(f"addresses {start} - {end - 1}")
