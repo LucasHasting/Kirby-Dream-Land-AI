@@ -603,6 +603,10 @@ def determine_game_state(data_after, current_state):
     else:
         if(game_state == 6):
             GAME_STATES[STATE_MAP["UNKOWN"]]
+        elif (current_state == "BOSS" and boss_health == 0):
+            current_state = GAME_STATES[STATE_MAP["UNKOWN"]]
+        elif (boss_health != 0):
+            current_state = GAME_STATES[STATE_MAP["BOSS"]]
 
         conditions = [False]
 
