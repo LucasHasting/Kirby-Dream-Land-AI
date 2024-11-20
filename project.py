@@ -12,7 +12,6 @@ Date: 11/20/2024
 Sources:
 https://retro.readthedocs.io/en/latest/
 https://github.com/openai/retro/releases/tag/f347d7e
-https://stackoverflow.com/questions/71973392/importerror-cannot-import-rendering-from-gym-envs-classic-control
 https://www.geeksforgeeks.org/python-gui-tkinter/
 https://stackoverflow.com/questions/6920302/how-to-pass-arguments-to-a-button-command-in-tkinter
 https://stackoverflow.com/questions/110923/how-do-i-close-a-tkinter-window
