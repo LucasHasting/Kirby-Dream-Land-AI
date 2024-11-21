@@ -32,7 +32,6 @@ Once in the directory, on the command prompt, run the following commands (on win
 ```sh
 python -m pip install gym-retro
 python -m pip install gym==0.21
-python -m pip install numpy
 python -m pip install scikit-learn
 python -m pip install tk
 ```
