@@ -10,7 +10,8 @@ Name: Lucas Hasting
 Date: 11/20/2024
 
 Sources:
-https://www.geeksforgeeks.org/how-to-clear-out-a-frame-in-the-tkinter/
+https://retro.readthedocs.io/en/latest/
+https://github.com/openai/retro/releases/tag/f347d7e
 https://www.geeksforgeeks.org/python-gui-tkinter/
 https://stackoverflow.com/questions/6920302/how-to-pass-arguments-to-a-button-command-in-tkinter
 https://stackoverflow.com/questions/110923/how-do-i-close-a-tkinter-window
@@ -23,11 +24,15 @@ FPS = 60
 SLEEP_TIME = 1/4
 
 #set the min and max allowed frame sizes for making random move sizes
-MIN_MOVE_SIZE = 30 
-MAN_MOVE_SIZE = 75
+MIN_MOVE_SIZE = 45
+MAN_MOVE_SIZE = 90
 
 #the starting game state
 STATE_FILE = "begginning.state"
+
+#used to determine how many wrong moves can be made until the
+#state changes to the previous state
+RESET_COUNT = 20
 
 #create map of inputs to position in action array
 INPUTS = {
@@ -42,7 +47,6 @@ INPUTS = {
     "DOWN-RIGHT": 9,
     "UP-LEFT": 2,
     "UP-RIGHT": 3
-    #unknown: 1, 2, 3
 }
 
 #create map of positions in action array to input
@@ -346,6 +350,9 @@ def game_driver(m, text_1 = "", text_2 = "", text_3 = "", screen_one=False, test
 
     #get move size (used for improve_model)
     moves_size = len(moves)
+
+    #get the starting state
+    state = [env.em.get_state()]
         
     #play the game
     while(True):
@@ -361,7 +368,6 @@ def game_driver(m, text_1 = "", text_2 = "", text_3 = "", screen_one=False, test
             break
 
         #get the current state and its data
-        state = env.em.get_state()
         before = load_data(info, STATE_MAP[current_state])
 
         #if a model has not been created
@@ -413,7 +419,8 @@ def compress_recording_file(text):
             move_frames.pop(i + 1)
             moves.pop(i + 1)
             size -= 1
-        i += 1
+        else:
+            i += 1
 
     #save the results in the recording file
     file = open("./data/recordings/"+text, "w")
@@ -481,7 +488,7 @@ def make_movement(action, env, move_size_model, state, random_move=False):
         move_size = round(move_size[0])
 
     #load the state before moving
-    env.em.set_state(state)
+    env.em.set_state(state[len(state) - 1])
 
     #perform the move for move_size frames
     for i in range(move_size):
@@ -492,10 +499,16 @@ def make_movement(action, env, move_size_model, state, random_move=False):
     return ob, rew, done, info, move_size
 
 #function used to make a move
-def make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, random_move = False, incorrect=[0], test_model=False):
-    #load the previous state if the move is random
-    if(random_move):
-        env.em.set_state(state)
+def make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, random_move = False, incorrect=[0], test_model=False, count=0):
+    #if the AI is stuck, revert to previous state
+    if(count == RESET_COUNT):
+        pop_data(total_data, moves, move_sizes, state, test_model)
+        count = 0
+
+        #update the models accordingly
+        if(not test_model):
+            model = update_model(total_data, moves)
+            move_size_model = update_move_size_model(moves, move_sizes)
 
     #give variables default values that will change later
     ob, rew, done, info, move_size = 0,0,0,0,0
@@ -524,12 +537,13 @@ def make_move(info, model, total_data, moves, state, env, move_size_model, move_
     #check game state and display the current state along with the predicted move
     current_state = determine_game_state([before[-2], before[-3], before[-7], before[-8]], current_state)
     if(random_move):
-        print(INVERSE_INPUTS[move], move_size, current_state)
+        print(INVERSE_INPUTS[move], move_size, current_state, count)
     else:
         print("Predicted: ", INVERSE_INPUTS[move], move_size, current_state)
 
     #determine if the move was good, if so, update the model. Otherwise, try a random move until a good move occurs
     if(good_move([before[-2], before[-1], before[-3], before[-4], before[-5], before[-6]], [after[-2], after[-1], after[-3], after[-4], after[-5], before[-6]], current_state)):
+        state.append(env.em.get_state())
         #if a model is not being tested, update the current models
         if(not test_model):
            add_to_data(total_data, after, moves, move, move_sizes, move_size)
@@ -540,7 +554,7 @@ def make_move(info, model, total_data, moves, state, env, move_size_model, move_
         if(not random_move):
             incorrect[0] += 1
         #try a random move
-        return make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True, incorrect, test_model)
+        return make_move(info, model, total_data, moves, state, env, move_size_model, move_sizes, before, current_state, True, incorrect, test_model, count + 1)
 
     #return both models to be updated in the driver, along with the current state
     return model, move_size_model, current_state
@@ -550,6 +564,14 @@ def add_to_data(total_data, new_data, moves, move, move_sizes, move_size):
     total_data.append(new_data)
     moves.append(move)
     move_sizes.append(move_size)
+
+#function used to remove data if a game state is stuck
+def pop_data(total_data, moves, move_sizes, state, test_model):
+    if(not test_model):
+        total_data.pop(len(total_data) - 1)
+        moves.pop(len(moves) - 1)
+        move_sizes.pop(len(move_sizes) - 1)
+    state.pop(len(state) - 1)
     
 #update the move prediciton model
 def update_model(total_data, moves):
@@ -602,6 +624,10 @@ def determine_game_state(data_after, current_state):
     else:
         if(game_state == 6):
             GAME_STATES[STATE_MAP["UNKOWN"]]
+        elif (current_state == "BOSS" and boss_health == 0):
+            current_state = GAME_STATES[STATE_MAP["UNKOWN"]]
+        elif (boss_health != 0):
+            current_state = GAME_STATES[STATE_MAP["BOSS"]]
 
         conditions = [False]
 
