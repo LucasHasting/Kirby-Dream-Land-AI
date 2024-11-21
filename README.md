@@ -34,9 +34,7 @@ python -m pip install gym-retro
 python -m pip install gym==0.21
 python -m pip install numpy
 python -m pip install scikit-learn
-python -m pip install random
-python -m pip install time
-python -m pip install tkinter
+python -m pip install tk
 ```
 
 Next, in a separate window, move the KirbysDreamLand-GameBoy folder to the following directory: 
