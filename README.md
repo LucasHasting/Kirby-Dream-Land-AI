@@ -33,7 +33,7 @@ Once in the directory, on the command prompt, run the following commands (on win
 python -m pip install gym-retro
 python -m pip install gym==0.21
 python -m pip install numpy
-python -m pip install sklearn
+python -m pip install scikit-learn
 python -m pip install random
 python -m pip install time
 python -m pip install tkinter
