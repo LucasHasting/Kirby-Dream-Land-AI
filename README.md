@@ -30,6 +30,7 @@ which python38
 Once in the directory, on the command prompt, run the following commands (on windows, replace python with python.exe):
 
 ```sh
+python -m pip install --upgrade pip
 python -m pip install gym-retro
 python -m pip install gym==0.21
 python -m pip install scikit-learn
